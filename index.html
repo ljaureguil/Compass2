@@ -1,0 +1,777 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width">
+    <script src="ds:/Sys/app.js"></script>
+</head>
+<style>
+body{
+    background:white;
+    width:95%;
+}
+.compass {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  margin: auto;
+ 
+}
+button{
+    margin:5px;
+    background-color:red;
+    color:white;
+    border-radius:3px;
+}
+#arrow{
+    font-size:8px;
+    
+}
+
+.compass > .arrow {
+  position: absolute;
+  transform-style:preserve-3d;
+  width: 0;
+  height: 0;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-style: solid;
+  border-width: 30px 20px 0 20px;
+  border-color: red transparent transparent transparent;
+  z-index: 1;
+}
+
+.compass > .compass-circle,
+.compass > .my-point {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+//  transition: transform 0.01s ease-out;
+  background: url(https://www.freeiconspng.com/thumbs/compass-rose-png/compass-rose-png-13.png) center
+    no-repeat;
+  background-size: contain;
+}
+
+.compass > .my-point {
+  opacity: 0;
+  width: 20%;
+  height: 20%;
+  background: rgb(8, 223, 69);
+  border-radius: 50%;
+  transition: opacity 0.5s ease-out;
+}
+#res{
+    position:absolute;
+    bottom:0%;
+    width:100%;
+    height:35%;
+    position.absolute;
+  //  bottom:3%;
+    left:1%;
+    border-style:solid;
+    overflow:auto;
+    font-size:8px;
+    text-align:center;
+    
+    
+}
+#texta{
+   position:absolute;
+    bottom:0%;
+  //  display:none;
+      width:100%;
+    height:100%;  
+    background-color:#aaffaa;
+    display:none;
+    
+}
+#canvas{ 
+    position:absolute;
+    bottom:0%;
+  //  display:none;
+      width:100%;
+    height:100%;  
+    background-color:#aaaaff;
+    transition: all .5s linear;
+   display:none;
+        
+    
+}
+.cd{
+   margin:5%;
+    border-style:solid;
+    border-radius:3px;
+    background:white;
+    color:black;
+    width:85%;
+    height:50%; 
+    font-size:12px;
+    margin:5px;
+    overflow:auto;
+    
+    
+}
+.ct{
+    width:96%;
+    height:70%;
+ //   color:white;
+ //   background:green;
+ font-weight:bold;
+    font-size:8px;
+    margin:5px;
+    padding 5px;
+    
+}
+
+</style>
+	<body onload="app.Start()">
+<div class="compass">
+  <div id="arrow" class="arrow"></div>
+  <div class="compass-circle"></div>
+  <div class="my-point"></div>
+</div>
+<button class="start-btn">Start compass</button>
+<select id="ssel" oninput=selOpc(this.value);sel=this.value>
+<option>Choose an option</option>
+
+<option>Obs between 2 points</option>
+<option>intersept by angles</option>
+<option>intersept by dispances</option>
+<option>offset left</option>
+<option>offset right</option>
+<option>offset with 2 points</option>
+<option></option>
+<option></option>
+
+</select>
+<br>	<button class="" onclick="setRef()" >Set Referencia</button><br>
+	<button class="" onclick="addP()" style="width:100%;height:5%;">add Point</button><br>
+	<button class="" onclick="clr()" >Clear</button>
+	<button class="" onclick="canvas.style.left='0%';anima()" >Show Canvas</button>		
+	<button class="" onclick="canvas.style.left='-110%';" >Show Editor</button>	
+	
+<div id="res">
+<textarea id="texta"></textarea>
+<canvas id="canvas" ></canvas>
+</div>
+<div id="dshow" style="position:absolute;width:90%;height:80%;top:10%;left:5%;background:baige;text-align:center;display:none;">
+<textarea id="tedi" style="width:90%;height:90%;font-size:20px;padding:5px;"></textarea>
+<button onclick="dshow.style.display='none' " style="width:90%;">Close</button>
+
+</div>
+	
+	<script >
+	
+	
+	</script>
+	
+	
+</body>
+<script>
+Mat={
+    // pii: Math.PI,
+     toRad(a) {
+         return a * Math.PI / 180
+     },
+     toDeg(a) {
+         return 180 * a / Math.PI
+     },
+     getObsG(p1, p2) {
+         var dx = p2.x - p1.x,
+             dy = p2.y - p1.y,
+             dz = p2.z - p1.z;
+             if(dx===0) dx=.000000000000001;
+        //     alert(dx)
+ 
+ 
+         var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+         var v = Math.PI/2-Math.asin(dy / d); //arcsin (dz / d);
+         var az = Math.atan(dz / dx); //arctan((x2 –x1)/(y2 –y1));
+         
+         var c = 1;
+      
+         if (dx >= 0 && dz >= 0) c = 2;
+         if (dx >= 0 && dz <= 0) c = 1;
+         if (dx <= 0 && dz <= 0) c = 4;
+         if (dx <= 0 && dz >= 0) c = 3;
+    //         alert("dx "+dx+"\ndz "+dz+"\nc "+c)  
+         var Az=this.radToAz(az, c);
+      
+    //     alert("flib\n\n"+Az)
+ 
+         return {
+             A:Az,
+             V:this.toDeg(v),
+             D:d,
+             az: this.toRad(Az),
+             v: v,
+             d: d,
+             dx: Math.cos(dy / d),
+             dy: dy
+         }
+     },
+     getObs(p1, p2,Gr) {
+         var dx = p2.x - p1.x,
+             dy = p2.y - p1.y,
+             dz = p2.z - p1.z;
+             if(dy===0)dy=.0000000000001;
+ 
+ 
+         var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+         var v = Math.PI/2-Math.asin(dz / d);// alert(v)//arcsin (dz / d);
+         var az = Math.atan(dx / dy); //arctan((x2 –x1)/(y2 –y1));
+         var c = 1;
+         if (dx >= 0 && dy >= 0) c = 1;
+         if (dx >= 0 && dy <= 0) c = 2;
+         if (dx <= 0 && dy <= 0) c = 3;
+         if (dx <= 0 && dy >= 0) c = 4;
+       //  alert(dy+"\nFrom MyLib:\n\n"+this.getAzRadians(az, c))
+ 
+         return {
+            Az: this.toDeg( this.getAzRadians(az, c)),
+            V: this.toDeg(v),   
+             D: d,
+             az: this.getAzRadians(az, c),
+             v: v,
+            
+             dx: Math.cos(dy / d),
+             dz: dz
+         }
+     },
+     getAzDeg(an, c) {
+        if (an < 0) an = an * -1;
+        if (c == 1) an = an;
+        if (c == 2) an = 180 - an;
+        if (c == 3) an = 180 + an;
+        if (c == 4) an = 360 - an;
+        return an;
+
+    }, 
+     getAzRadians(a,c){
+        var an = a;
+         if (an < 0) an = an * -1;
+         if (c == 1) an = an;
+         if (c == 2) an = Math.PI - an;
+         if (c == 3) an = Math.PI + an;
+         if (c == 4) an = 2*Math.PI - an;
+         return an;
+     },
+ 
+     radToAz(a, c) {
+       
+  
+         var an = this.toDeg(a);
+      //   alert(an+"\n\n"+c)
+         if (an < 0) an = an * (-1);
+         if (c == 1) an = 90-an;
+         if (c == 2) an = 90 + an;
+         if (c == 3) an = 270 - an;
+         if (c == 4) an = 270 + an;
+         if(an===360) an=0;
+         return an;
+ 
+     },
+     degToAz(an, c) {
+         if (an < 0) an = an * -1;
+         if (c == 1) an = an;
+         if (c == 2) an = 180 - an;
+         if (c == 3) an = 180 + an;
+         if (c == 4) an = 360 - an;
+         return an;
+ 
+     },
+ 
+ //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
+     calcCrow(lat1, lon1, lat2, lon2) 
+     {
+       var R = 6371; // km
+       var dLat = this.toRad(lat2-lat1);
+       var dLon = this.toRad(lon2-lon1);
+       var lat1 = this.toRad(lat1);
+       var lat2 = this.toRad(lat2);
+ 
+       var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+         Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+       var d = R * c;
+       return d;
+     },
+ getPos(p,a,v,d){
+  var pos={},or={};
+  or.p=p;
+ or.az=a;
+ or.v=v;
+ or.d=d;
+ a=90-a;
+ v=this.toRad(v)
+ var dx=Math.sin(v)*d;
+ var h=Math.cos(v)*d;
+ a=this.toRad(a);
+ 
+ pos.x=dx*Math.cos(a)+p.x;
+ pos.y=dx*Math.sin(a)+p.y;
+ pos.z=h+p.z;//dx*Math.sin(a)+p.z;
+ pos.dx=dx;
+ pos.dy=h;
+ pos.or=or;
+
+ return pos;
+ 
+ },
+ getPosG(p,a,v,d){
+  var pos={};
+ a=90-a;
+ v=this.toRad(v)
+ var dx=Math.cos(v)*d;
+ a=this.toRad(a);
+ 
+ pos.x=dx*Math.cos(a)+p.x;
+ pos.y=d*Math.sin(v)+p.y;
+ pos.z=dx*Math.sin(a)+p.z;
+ return pos;
+ 
+ },
+ repObj(ob){
+  var s=JSON.stringify(ob).replace(/"/g," ").replace(/:/g,": ").replace(/,/g,"\n").replace(/{/g,"\n").replace(/}/g,"\n");
+     return s;
+ },
+ interByDis(a,b,c){
+ var x1=(a*a+c*c-b*b)/(2*c)
+ var x2=c-x1;
+ var ra=Math.acos(x1/a), A=this.toDeg(ra);
+ var rc=Math.acos(x2/b), C=this.toDeg(rc);
+ var rb=2*Math.PI-ra-rc;
+ var B=180-A-C;
+ return {A:A,B:B,C:C,a:ra,b:rb,c:rc}
+ },
+interByAng(p1,p2,a1,a2){
+    var dx=p2.x-p1.x;
+    var dy=p2.y-p1.y;
+var d=Math.sqrt(dx*dx+dy*dy)
+var a=Math.atan(dy/dx);
+var da=180-(a1+a2);
+
+var x=Math.tan(a2)*d/(Math.tan(a1)+Math.tan(a2))
+var y=Math.tan(a1)*x;
+
+var p={}
+p.x=x
+p.y=y
+p.a=Math.atan(y/x);
+var d=Math.sqrt(x*x+y*y);
+p.r=d;
+var xx=d*Math.cos(a+p.a);
+var yy=d*Math.sin(a+p.a);
+p.xx=xx;
+p.yy=yy;
+
+return p
+
+},
+ interByAngLn(inf={line1:{p1,p2},line2:{p1,p2}}){
+    // var dx=
+ }
+ 
+ }
+ 
+
+</script>
+<script>
+var sel="";
+canvas.width=res.clientWidth;canvas.height=texta.clientHeight;
+	loadScript("https://raw.githubusercontent.com/ljaureguil/My-Library/refs/heads/master/MyLib.js",
+	function(){
+
+	    loadScript("https://raw.githubusercontent.com/ljaureguil/My-Library/refs/heads/master/three.min.js",
+	    function(){
+	    loadScript("https://raw.githubusercontent.com/ljaureguil/My-Library/refs/heads/master/TrackballControls.js",
+	    function(){	        
+	        
+	          setUpRend(canvas);
+	          
+	    })       
+	          
+	          
+	    })
+	  
+	    
+	    })
+	
+
+
+o={};
+var pts=[],a1=0,a2=0,po={},pa={},adj=0,cero=false;;;
+po.x=0;po.y=0;po.z=0;;
+const compassCircle = document.querySelector(".compass-circle");
+const startBtn = document.querySelector(".start-btn");
+const myPoint = document.querySelector(".my-point");
+
+
+
+
+
+
+
+
+let compass;
+const isIOS = !(
+  navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+  navigator.userAgent.match(/AppleWebKit/)
+);
+function init() {
+  //  
+  startBtn.addEventListener("click", startCompass);
+}
+
+function startCompass() {
+  if (isIOS) {
+//    DeviceOrientationEvent.requestPermission()
+  //    .then((response) => {
+  //      if (response === "granted") {
+          window.addEventListener("deviceorientation", handler, true);
+  //      } else {
+  //        alert("has to be allowed!");
+  //      }
+  //    })
+  //    .catch(() => alert("not supported"));
+  } else {
+    window.addEventListener("deviceorientationabsolute", handler, true);
+  }
+}
+
+function handler(e) {
+  compass = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+  o.alpha=e.alpha;
+  o.az=360-e.alpha;
+  o.e=o.az-adj
+  if(o.e<0) o.e=360+o.e
+  if(o.e>360) o.e=o.e-360;
+  o.az=o.e;
+  o.v=90-e.beta;//90-Mat.toDeg(e.beta);
+// texta.value=JSON.stringify(o).replace(/,/g,"\n")
+arrow.innerHTML=o.az.toFixed(3)+"<br>"+o.v.toFixed(3);
+  compassCircle.style.transform = `translate(-50%, -50%) rotate(${- o.az}deg)`;//-compass
+}
+
+function setRef(){
+      var a=prompt("Point to your Rererence and type angle","0")*1;
+   //   adj=a;//o.az-a;
+   //   adj=o.baz-a;
+      adj=360-o.alpha-a;
+     
+}
+
+
+init();
+
+
+let pointDegree;
+
+function calcDegreeToPoint(latitude, longitude) {
+  // Qibla geolocation
+  const point = {
+    lat: 21.422487,
+    lng: 39.826206,
+  };
+
+  const phiK = (point.lat * Math.PI) / 180.0;
+  const lambdaK = (point.lng * Math.PI) / 180.0;
+  const phi = (latitude * Math.PI) / 180.0;
+  const lambda = (longitude * Math.PI) / 180.0;
+  const psi =
+    (180.0 / Math.PI) *
+    Math.atan2(
+      Math.sin(lambdaK - lambda),
+      Math.cos(phi) * Math.tan(phiK) -
+        Math.sin(phi) * Math.cos(lambdaK - lambda)
+    );
+  return Math.round(psi);
+}
+
+function addP(){
+//var d=prompt("dist","1")*1
+d=1;
+
+var oo=Mat.getPos(po,o.az,o.v,d)
+//alert(JSON.stringify(oo));
+pts.push(oo);
+var cp={};
+cp.n=pts.length
+cp.pb=po;
+cp.az=o.az;
+cp.v=o.v;
+cp.d=0;  
+  crP(cp);
+
+
+texta.value=JSON.stringify(pts);
+if(pts.length>1){
+    var l=pts.length-1;
+    var pp=Mat.getObsG(pts[l-1],pts[l]);
+    texta.value+="\n\n"+JSON.stringify(pp).replace(/,/g,"\n");
+    oo.or.n=l;
+
+    
+}
+}
+
+
+function clr(){//alert("cc")
+    texta.value="";
+    pts.splice();
+    
+    
+}
+
+function selOpc(v){
+    clr();
+    sel=v;
+   
+
+if(v==="Obs between 2 points"){
+    alert("Choose P1")
+}
+if(v==="intersept by angles"){
+    
+}
+if(v==="intersept by dispances"){
+    
+}
+if(v==="offset left"){
+    
+}
+if(v==="offset right"){
+    
+}
+if(v==="offset with 2 points"){
+    
+}
+
+ if(v===""){
+    
+}
+  if(v===""){
+    
+}
+ if(v===""){
+    
+}
+if(v===""){
+    
+}
+
+}
+
+function setUpRend(canvas) {
+    rend = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true
+    });
+    tx=new THREE.TextureLoader().load("https://www.freeiconspng.com/thumbs/compass-rose-png/compass-rose-png-13.png")
+    rend.setSize(canvas.width, canvas.height);
+    //rend.setAnimationLoop( anima );
+    sce = new THREE.Scene();
+    came = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000); //ca3.width/ca3.height//window.innerWidth / window.innerHeigh 
+
+   // geomet = new THREE.BoxGeometry(3, 3, 5);
+   geomet= new THREE.CylinderGeometry( 15, 15, 1, 32 ); 
+   // cte = new THREE.CanvasTexture(canvas);
+    materi = new THREE.MeshPhongMaterial({
+        color: 0xf0ffff, transparent: true,
+       map: tx
+    });
+    cube = new THREE.Mesh(geomet, materi);
+    sce.add(cube);
+
+
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(20, 20, 100);
+
+    spotLight.castShadow = true;
+
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+
+    spotLight.shadow.camera.near = 500;
+    spotLight.shadow.camera.far = 4000;
+    spotLight.shadow.camera.fov = 30;
+
+
+
+    sce.add(spotLight)
+
+    came.position.z = 30;
+    
+    //controles
+                controls = new THREE.TrackballControls(came, rend.domElement); //camera
+            controls.zoomSpeed = .48;//1.2;
+            controls.panSpeed = .36;//0.8;
+
+    
+               window.addEventListener('resize', onWindowResize, false);
+    
+    
+    
+ //   anima()
+    requestAnimationFrame(function(){anima()})
+  setTimeout(function(){ setBackground("https://img.freepik.com/free-photo/shot-panoramic-composition-living-room_23-2150315635.jpg");},3000)
+
+}
+
+function anima() {
+ controls.update();
+  //  txx.needsUpdate = true;
+    cube.material.needsUpdate = true;
+    cube.rotation.y= Mat.toRad(o.az)//+= 0.01;
+    cube.rotation.x= Mat.toRad(o.v)// += 0.01;
+  //  piii.value = cube.rotation.y;
+    rend.render(sce, came);
+   if(canvas.style.left==="0%") setTimeout("anima()",1)
+}
+function loadDoc (url) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", url, false);
+        xhttp.send();
+      //  calback();
+        return xhttp.responseText;
+    }
+
+function loadScript(url, callback) {
+
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        var code = loadDoc(url);
+        try {
+            s.appendChild(document.createTextNode(code));
+            document.body.appendChild(s); //
+            callback();
+        } catch (e) {
+            s.text = code;
+            document.body.appendChild(s);
+            callback();
+        }
+    }
+
+
+
+function setBackground(bkg){// alert(bkg); if(bkg.indexOf("cfi1https:")>-1) alert(bkg)
+
+  var textureLoader=new THREE.TextureLoader();
+     textureLoader.load(bkg,
+             function(texture) {
+ 
+var options = {
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					magFilter: THREE.LinearFilter
+				};
+
+sce.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( rend, texture );
+sce.textura=texture;
+//scene.urlbkg=bkg;
+//scene.bkgname=n;
+//selact.children[1].innerHTML="Remove "+n;
+
+
+            })/**/
+
+}
+
+       function onWindowResize() {
+ 
+        //   came.aspect = canvas.width / canvas.height;
+         //   came.updateProjectionMatrix();
+           came.aspect = window.innerWidth / window.innerHeight;
+            came.updateProjectionMatrix();
+         //   came.aspect = window.innerWidth / window.innerHeight;
+         //   came.updateProjectionMatrix();
+  //    if(container2.style.display="block") renderer2.setSize( window.innerWidth, window.innerHeight);      
+            rend.setSize(window.innerWidth, window.innerHeight);
+        // 
+        anima();
+    
+        }
+
+function crP(p){  
+    var d=document.createElement("div");//d.innerHTML="<b>"+p.n;
+    var pp=document.createElement("button");pp.innerHTML=p.n+"<b>";
+    d.appendChild(pp);
+    pp.style="color:white;background:red;width:80%;border-radius:100px;"
+    
+    var t=document.createElement("textarea");
+    d.appendChild(t);
+    pp.o=p;
+    d.setAttribute("class","cd");
+    t.setAttribute("class","ct");
+    t.setAttribute("readonly", true)
+    t.ob=p;//JSON.stringify(p);
+
+    t.value=JSON.stringify(p).replace(/,/g,"\n").replace(/{/g,"{\n").replace(/}/g,"\n}").replace(/"/g,"");
+  //  d.setAttribute("onclick",);
+    pp.onclick=function(){
+        var te=this.parentNode.children[1]
+    //    alert(te.value)
+        var dd=prompt("Distance?","1")*1;
+        var oo=Mat.getPos(this.o.pb,this.o.az,this.o.v,dd);
+        te.value=JSON.stringify(oo).replace(/,/g,"\n").replace(/{/g,"{\n").replace(/}/g,"\n}").replace(/"/g,"");
+        this.parentNode.cordenadas=oo;
+   //  alert("*************o\n"+JSON.stringify(oo));
+       
+        }
+        
+        t.onclick=function(){
+            
+            if(ssel.selectedIndex===0){
+            
+            tedi.value=this.value;
+            tedi.ob=p;
+            tedi.value=this.value;
+            dshow.style.display="block";
+            }
+            if(ssel.selectedIndex===1){
+             //   alert(this.ob);
+             var c=this.parentNode.cordenadas;
+                if(ssel.p0===undefined){
+                    ssel.p0=c
+                                    alert("Now Choose P2");
+                }
+                else{
+                 
+                    
+                    var obs=Mat.getObs(ssel.p0,c);
+                    alert("Obs. between p1 and p2\n\n"+JSON.stringify(obs).replace(/,/g,"\n").replace(/{/g,"{\n").replace(/}/g,"\n}").replace(/"/g,""))
+                ssel.p0=undefined;
+                ssel.selectedIndex = 0;
+                }
+                
+                }
+            if(ssel.selectedIndex===2){}
+            if(ssel.selectedIndex===3){}
+            if(ssel.selectedIndex===4){}
+             if(ssel.selectedIndex===50){}
+              if(ssel.selectedIndex===6){}
+         
+            
+            
+        }
+
+    res.prepend(d);
+ 
+ 
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+</html>
