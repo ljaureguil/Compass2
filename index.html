@@ -2,7 +2,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width">
-    <script src="ds:/Sys/app.js"></script>
+  
 </head>
 <style>
     body {
@@ -618,7 +618,7 @@
     }
 </style>
 
-<body onload="app.Start()">
+<body >
     <div id="art">
         <div class="compass" onclick="ang=JSON.parse(JSON.stringify(o));alert(JSON.stringify(ang))">
             <div id="arrow" class="arrow"></div>
@@ -1398,7 +1398,7 @@
         scalar = "";
         if (estniv) {
 
-            app.ShowPopup("Don't forget...\nOnce in a while Calibrate Level");
+  
 
             window.addEventListener("devicemotion", motion, true);
             estniv = false;
