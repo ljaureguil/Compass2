@@ -593,6 +593,25 @@
         background: white;
 
     }
+    #dgps{
+             position: relative;
+        bottom: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        font-size: 8px;
+        background: white;
+  
+        
+    }
+    #tgps{
+        width:100%;
+        height:100%;
+        padding:10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        background-color:rgba(250,250,200);
+    }
+    
 
     #art {
         //   position:absolute;
@@ -654,6 +673,9 @@
             </div>
 
         </div>
+        <div id="dgps">
+        <textarea id="tgps"></textarea>
+        </div>
 
 
     </div>
@@ -666,8 +688,11 @@
         <option>intersept by dispances</option>
         <option>offset left</option>
         <option>offset right</option>
-        <option>offset with 2 points</option>
+        <option>offset with 2 points</option> 
+        <option>Capture GPS pos</option>
+
         <option></option>
+        
         <option>Show Editor</option>
 
     </select>
@@ -944,6 +969,7 @@
     }
 </script>
 <script>
+var geoP={};var geo="";
     var ang = "";
     var g = 9.81
     var sel = "",
@@ -1019,7 +1045,7 @@
         }
 
         activeNivel();
-
+//getLocation();
 
     }
 
@@ -1149,7 +1175,8 @@
             //              tedi.value = this.value;
             dshow.style.display = "block";
         }
-        if (v === "") {
+        if (v === "Capture GPS pos") {
+             navigator.geolocation.getCurrentPosition(function(p){geoP=p;tgps.value=JSON.stringify(geoP)});
 
         }
         if (v === "") {
@@ -1538,19 +1565,20 @@
     }
     
     loadScript("https://gist.githubusercontent.com/cosinekitty/dc4a9a666c829eccf973e0de91dfd5f6/raw/84625f937615c8e5548d90a50f79aa1ec0686b4d/LocationToPoint.js",function(r){
-    alert("ready0");
-//var x = document.getElementById("pi");
-getLocation();var ti;
+
+//var ti;
 //ti=setInterval(function(){if(Editor.style.display==='block'){clearInterval(ti);navigator.clearWatch();alert("stoped");}},500);
 
-    alert("ready");
-
+  
     })
+
+
+
+
     function getLocation() {
-      dshow.style.display="block";
-        
+         
   if (navigator.geolocation) {
-  id= navigator.geolocation.watchPosition(showPosition, null, {maximumAge:100, enableHighAccuracy:true});
+  geo= navigator.geolocation.watchPosition(showPosition, null, {maximumAge:100, enableHighAccuracy:true});
 
   } else { 
     pi.innerHTML = "Geolocation is not supported by this browser.";
@@ -1558,10 +1586,17 @@ getLocation();var ti;
   
   
 }
+var igps=0;
 function showPosition(p){   
-   tedi.value=JSON.stringify(p);
+    igps++;
+
+   tgps.value=JSON.stringify(p);
+
+   geoP=p;
     
 }
+
+//setTimeout(function(){ navigator.geolocation.clearWatch(geo);alert("Whatch stoped")},25000);
 
     
     
