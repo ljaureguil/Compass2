@@ -607,9 +607,9 @@
 
     #pniv {
         position: absolute;
-        left: 15%;
+        left: 1%;
         bottom: 0%;
-        font-size: 18px;
+        font-size: 16px;
         background: white;
         font-weight: bold;
         //  transition: opacity 2ss;
@@ -1467,7 +1467,7 @@
             var aagx = 90 - mob.anx;
  
             neddle.style.transform = "rotateZ(" + mob.anx + "deg) " //rotateX("+pitch+"deg) 
-            pniv.innerHTML = " AngX=" + (aagx.toFixed(2)) + " <br> AngY=" + mob.any.toFixed(2) + " <br> AngZ=" + mob.anz.toFixed(2);
+            pniv.innerHTML = " AngX=" + (aagx.toFixed(2)) + " . .  AngY=" + mob.any.toFixed(2) + " . .  AngZ=" + mob.anz.toFixed(2);
 
 
 
@@ -1536,6 +1536,38 @@
             mob.adjz = 0;
             mob.update();
     }
+    
+    loadScript("https://gist.githubusercontent.com/cosinekitty/dc4a9a666c829eccf973e0de91dfd5f6/raw/84625f937615c8e5548d90a50f79aa1ec0686b4d/LocationToPoint.js",function(r){
+    alert("ready0");
+//var x = document.getElementById("pi");
+getLocation();var ti;
+//ti=setInterval(function(){if(Editor.style.display==='block'){clearInterval(ti);navigator.clearWatch();alert("stoped");}},500);
+
+    alert("ready");
+
+    })
+    function getLocation() {
+      dshow.style.display="block";
+        
+  if (navigator.geolocation) {
+  id= navigator.geolocation.watchPosition(showPosition, null, {maximumAge:100, enableHighAccuracy:true});
+
+  } else { 
+    pi.innerHTML = "Geolocation is not supported by this browser.";
+  }
+  
+  
+}
+function showPosition(p){   
+   tedi.value=JSON.stringify(p);
+    
+}
+
+    
+    
+    
+    
+    
 </script>
 
 
