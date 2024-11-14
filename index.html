@@ -1573,7 +1573,7 @@ var geoP={};var geo="";
     })
 
 
-
+getLocation();
 
     function getLocation() {
          
@@ -1581,7 +1581,7 @@ var geoP={};var geo="";
   geo= navigator.geolocation.watchPosition(showPosition, null, {maximumAge:100, enableHighAccuracy:true});
 
   } else { 
-    pi.innerHTML = "Geolocation is not supported by this browser.";
+  //  pi.innerHTML = "Geolocation is not supported by this browser.";
   }
   
   
@@ -1592,14 +1592,57 @@ function showPosition(p){
 
    tgps.value=JSON.stringify(p);
 
+var pg=getObsGPS(geoP,p);
+tgps.value=JSON.stringify(pg)
    geoP=p;
+   var lat=p.lat,lon=p.lon;
+   var R = 6371e3;
+  var    x = R * cos(lat) * cos(lon)
+var y = R * cos(lat) * sin(lon)
+var z = R * sin(lat)
+   /*
+
+   
+   lat = asin(z / R)
+lon = atan2(y, x)
+   
+   
+   */
     
 }
 
 //setTimeout(function(){ navigator.geolocation.clearWatch(geo);alert("Whatch stoped")},25000);
+var pg=getObsGPS({lat:37.70825584,lon:133.8000000035},{lat:37.70895984,lon:133.800005035});
+alert(JSON.stringify(pg))
+    
+  function getObsGPS(p1,p2){
+     //     alert(JSON.stringify(p1))
+     //     alert(JSON.stringify(p2))
+    if(p1.longitude!=undefined){ p1.lat=p1.latitude;p1.lon=p1.longitude;p2.lat=p2.latitude;p2.lon=p2.longitude;}
+        const R = 6371e3; // metres
+const φ1 = p1.lat * Math.PI/180; // φ, λ in radians
+const φ2 = p2.lat * Math.PI/180;
+const Δφ = (p2.lat-p1.lat) * Math.PI/180;
+const Δλ = (p2.lon-p1.lon) * Math.PI/180;
 
-    
-    
+const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ/2) * Math.sin(Δλ/2);
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+const d = R * c; // in metres
+//alert(d)
+// calc bearing
+var λ2=p2.lat,λ1=p1.lat,lo1=p1.lon,lo2=p2.lon;
+const y = Math.sin(λ2-λ1) * Math.cos(lo2);
+const x = Math.cos(lo1)*Math.sin(lo2) -
+          Math.sin(lo1)*Math.cos(lo2)*Math.cos(λ2-λ1);
+const θ = Math.atan2(y, x);
+const brng = (θ*180/Math.PI + 360) % 360; // in degrees
+////alert(brng)
+   return {azimuth:brng,distance:d,x:x,y:y}     
+ 
+}  
     
     
     
