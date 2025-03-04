@@ -484,6 +484,10 @@
         right: 5%;
         top: 5%;
     }
+   #block{
+          right: 5%;
+        bottom: 5%;     
+    }
 
     #calibrate {
         left: 5%;
@@ -661,7 +665,7 @@
                 <p id="pniv"></p>
                 <button id="calibrate" class="cal" onclick="calibrar()">Cal</button>
                 <button id="howcal" class="cal" onclick="howcalibrar()">Reset</button>
-
+ <button id="block" class="cal" onclick="flock()">Lock</button>
 
                 <div id="dframe">
                     <img id="burbuja" src="https://i.ibb.co/q1b5FBB/bur.png">
@@ -722,6 +726,7 @@
 
 </body>
 <script>
+
     Mat = {
         // pii: Math.PI,
         toRad(a) {
@@ -969,6 +974,18 @@
     }
 </script>
 <script>
+
+//var myScreenOrientation = window.screen.orientation;
+//myScreenOrientation.lock("portrait");
+
+
+//myScreenOrientation.unlock();
+
+
+v0lock=0;
+vlock=0;
+diflock=0;
+slock="";
 var geoP={};var geo="";
     var ang = "";
     var g = 9.81
@@ -1492,9 +1509,12 @@ var geoP={};var geo="";
             mob.update()
 
             var aagx = 90 - mob.anx;
- 
+  vlock=(aagx.toFixed(2));
+  var dif=(vlock-v0lock).toFixed(2)
+slock ="<font color=red>"+ dif+"</font>";
             neddle.style.transform = "rotateZ(" + mob.anx + "deg) " //rotateX("+pitch+"deg) 
-            pniv.innerHTML = " AngX=" + (aagx.toFixed(2)) + " . .  AngY=" + mob.any.toFixed(2) + " . .  AngZ=" + mob.anz.toFixed(2);
+            pniv.innerHTML = " AngX=" + (aagx.toFixed(2)) + " . .  AngY=" + mob.any.toFixed(2) + " . .  AngZ=" + mob.anz.toFixed(2)+"<br>"+slock;
+           
 
 
 
@@ -1643,7 +1663,20 @@ const brng = (θ*180/Math.PI + 360) % 360; // in degrees
    return {azimuth:brng,distance:d,x:x,y:y}     
  
 }  
-    
+
+    function flock(){
+        if(v0lock===0){
+            v0lock=vlock;
+            
+        }
+        else
+        {
+         v0lock=0;
+           
+            
+            
+        }
+    }
     
     
 </script>
