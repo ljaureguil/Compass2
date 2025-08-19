@@ -652,11 +652,7 @@
 
 <body >
     <div id="art"> 
-    <div id="dcanvas">
-    
-             <canvas id="canvass"></canvas>
-             
-             </div>
+ 
         <div class="compass" onclick="ang=JSON.parse(JSON.stringify(o));alert(JSON.stringify(ang))">
   
             
@@ -671,7 +667,11 @@
 
         </div>
 
-
+   <div id="dcanvas">
+    
+             <canvas id="canvass"></canvas>
+             
+             </div>
 
         <div id="nivel">
 
@@ -1117,8 +1117,8 @@ var geoP={};var geo="";
 
     }
 //setTimeout(function(){
-  canvass.width=310;
-  canvass.height=310;
+  canvass.width=300;
+  canvass.height=300;
  
 //},5000);
     init();
@@ -1735,7 +1735,7 @@ stopmeasuring();
 
 
 var color="rgba(50,255,50,.5)"
-var r=canvass.width/2-3, cx=r+3, cy=r+3, o={} , di=0, ch=false;
+var r=canvass.width/2-5, cx=r+8, cy=r+8, o={} , di=0, ch=false;
     const ctx = canvass.getContext('2d');
 //ctx.width=500;
 //ctx.height=500;
